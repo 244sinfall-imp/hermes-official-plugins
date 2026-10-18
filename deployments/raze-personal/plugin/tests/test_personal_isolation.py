@@ -1,5 +1,10 @@
 """Deployment acceptance: synthetic state only; no real auth, CLI, or network."""
 import copy
+import builtins
+import io
+import os
+import json
+import ast
 from concurrent.futures import ThreadPoolExecutor
 from email.message import Message
 import hashlib
@@ -22,6 +27,23 @@ def forbidden(*args, **kwargs):
 
 @pytest.fixture(autouse=True)
 def offline(monkeypatch, tmp_path):
+    # Tripwires intercept BEFORE real private state can be opened, including Path I/O.
+    protected = ('/home/hermes/.hermes/config.yaml', '/home/hermes/.hermes/.env',
+                 '/home/hermes/.hermes/auth.json', '/home/hermes/.hermes/claude-policy.json',
+                 '/home/hermes/.hermes/claude-config',
+                 '/home/hermes/.hermes/claude-home',
+                 '/home/hermes/.hermes/claude-runtime',
+                 '/home/hermes/.hermes/profiles/newo')
+    def guard(original):
+        def checked(path, *args, **kwargs):
+            if not isinstance(path, int):
+                candidate = os.path.abspath(os.fsdecode(path))
+                if any(candidate == root or candidate.startswith(root + '/') for root in protected):
+                    raise AssertionError('Offline acceptance blocked real private-state access')
+            return original(path, *args, **kwargs)
+        return checked
+    for module in (builtins, io, os):
+        monkeypatch.setattr(module, 'open', guard(module.open))
     monkeypatch.setattr(socket.socket, 'connect', forbidden)
     monkeypatch.setattr(socket.socket, 'connect_ex', forbidden)
     monkeypatch.setattr(socket, 'create_connection', forbidden)
@@ -47,7 +69,7 @@ def account(monkeypatch):
               'email': 'owner@example.invalid', 'orgId': 'synthetic-personal-org'}
     monkeypatch.setattr(p, 'policy', lambda: declaration)
     monkeypatch.setattr(p, 'credentials', lambda: {'accessToken': 'synthetic-native-token'})
-    monkeypatch.setattr(p, 'auth_status', lambda: status)
+    monkeypatch.setattr(p, 'auth_status', lambda env=None: status)
     return declaration, status
 
 
@@ -132,9 +154,8 @@ def test_matching_personal_plan_accepted(account, plan):
 
 @pytest.mark.parametrize('field,value', [
     ('loggedIn', False), ('authMethod', 'apiKey'), ('apiProvider', 'bedrock'),
-    ('subscriptionType', 'enterprise'), ('subscriptionType', 'team'), ('subscriptionType', 'max'),
     ('configDirectory', '/foreign'), ('email', 'foreign@example.invalid'), ('orgId', 'foreign-org')])
-def test_wrong_auth_plan_config_identity_rejected(account, field, value):
+def test_wrong_auth_config_identity_rejected(account, field, value):
     account[1][field] = value
     with pytest.raises(p.PolicyError):
         p.ready(MODEL)
@@ -143,8 +164,44 @@ def test_wrong_auth_plan_config_identity_rejected(account, field, value):
 @pytest.mark.parametrize('plan', [None, '', 'enterprise', 'team', 'Pro'])
 def test_plan_not_inferred(account, plan):
     account[0]['subscription_type'] = plan
-    with pytest.raises(p.PolicyError):
+    before = copy.deepcopy(account)
+    assert p.ready(MODEL) is account[1]
+    assert account == before  # No plan guessing or credential/policy metadata writes.
+
+
+@pytest.mark.parametrize('plan', [None, 'max', 'future_personal_tier', 'enterprise', 'team'])
+def test_tariff_metadata_is_not_admission(account, plan):
+    account[1]['subscriptionType'] = plan
+    before = copy.deepcopy(account)
+    assert p.ready(MODEL) is account[1]
+    assert account == before
+
+
+def test_missing_tariff_fields_accepted_without_inference(account):
+    account[0].pop('subscription_type')
+    account[1].pop('subscriptionType')
+    before = copy.deepcopy(account)
+    assert p.ready(MODEL) is account[1]
+    assert account == before
+
+
+@pytest.mark.parametrize('field', ['email', 'orgId'])
+@pytest.mark.parametrize('value', [None, '', {}, [], 'foreign@example.invalid'])
+def test_missing_or_malformed_identity_rejected_with_unknown_tariff(account, field, value):
+    account[1]['subscriptionType'] = None
+    account[1][field] = value
+    with pytest.raises(p.PolicyError, match='identity'):
         p.ready(MODEL)
+
+
+@pytest.mark.parametrize('plan,label', [(None, ''), ('max', 'Claude Max'),
+                                       ('future_personal_tier', 'Claude Future Personal Tier')])
+def test_setup_tariff_is_optional_information(account, monkeypatch, plan, label):
+    import directsdk_setup as setup
+    monkeypatch.setattr(p, 'environment', lambda env=None: {})
+    monkeypatch.setattr(p, 'validate_command', lambda cmd=None: ['synthetic-never-executed'])
+    account[1]['subscriptionType'] = plan
+    assert setup.setup_status()['plan'] == label
 
 
 @pytest.mark.parametrize('pins', [{}, {'email': {}}, None, {'email': None, 'organization': {}},
@@ -218,6 +275,61 @@ def test_native_headers_exact_and_rotation(account):
     with pytest.raises(p.PolicyError):
         p.validate_headers(headers('foreign'))
     account[0]['activated'] = True
+
+
+def test_native_header_rotation_rereads_credentials(account, monkeypatch):
+    current = {'accessToken': 'synthetic-native-token'}
+    monkeypatch.setattr(p, 'credentials', lambda: current)
+    p.validate_headers(headers())
+    current['accessToken'] = 'synthetic-rotated-token'
+    with pytest.raises(p.PolicyError):
+        p.validate_headers(headers())
+    p.validate_headers(headers('synthetic-rotated-token'))
+
+
+def test_real_private_state_open_tripwire():
+    with pytest.raises(AssertionError, match='private-state'):
+        (p.CONFIG / '.credentials.json').read_text()
+    with pytest.raises(AssertionError, match='private-state'):
+        (p.HOME / 'claude-policy.json').read_text()
+
+
+@pytest.mark.parametrize('field', ['email', 'orgId'])
+def test_absent_identity_rejected(account, field):
+    account[1]['subscriptionType'] = None
+    account[1].pop(field)
+    with pytest.raises(p.PolicyError, match='identity'):
+        p.ready(MODEL)
+
+
+def test_baseline_origin_and_package_closure():
+    root = Path(__file__).resolve().parents[1]
+    baseline = json.loads((root.parent / 'baseline-manifest.json').read_text())
+    assert baseline['upstream_main'] == 'f98c0999c6dd4e59680addc8f3480208018ab5b0'
+    assert baseline['catalog_pin'] == '6dacaaddbfd8e98dfc524096c44f712f743246b8'
+    assert baseline['actual_baseline']['pyproject_version'] == '0.3.1'
+    assert baseline['actual_baseline']['plugin_manifest_version'] == '0.3.2'
+    assert baseline['actual_baseline']['git_repository'] is False
+    entries = {entry['path']: entry for entry in baseline['files']}
+    assert len(entries) == len(baseline['files']) == 34
+    actual = {str(file.relative_to(root)) for file in root.rglob('*')
+              if file.is_file() and '__pycache__' not in file.parts}
+    assert actual == set(entries)
+    changed = {'profile_policy.py', 'README.md', 'pyproject.toml', 'plugin.yaml',
+               'tests/test_personal_isolation.py', 'tests/test_personal_provider.py'}
+    for name, entry in entries.items():
+        if name not in changed:
+            assert hashlib.sha256((root / name).read_bytes()).hexdigest() == entry['sha256']
+    local = {'admission', 'directsdk', 'directsdk_setup', 'inert_mcp', 'model_catalog', 'profile_policy'}
+    for file in root.glob('*.py'):
+        for node in ast.walk(ast.parse(file.read_text())):
+            if isinstance(node, ast.ImportFrom):
+                if node.level and node.module is None:
+                    names = {alias.name for alias in node.names}
+                else:
+                    names = {node.module.split('.')[0]} if node.module else set()
+                for name in names & local:
+                    assert name + '.py' in entries
 
 
 def test_admission_header_guard_keeps_owner_context(account, monkeypatch):

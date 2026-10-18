@@ -1,6 +1,6 @@
 name: claude-subscription-directsdk-experimental
 kind: model-provider
-version: 0.3.2
+version: 0.3.1+raze.1
 manifest_version: 2
 description: Default-profile-only personal Claude Pro/Max adapter; private owner-confirmed activation required; no ambient or foreign credentials
 author: Nous Research

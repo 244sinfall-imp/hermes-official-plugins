@@ -204,11 +204,8 @@ def ready(model=None):
     status = auth_status()
     if status.get('loggedIn') is not True or status.get('authMethod') != 'claude.ai' or status.get('apiProvider') != 'firstParty':
         raise PolicyError('Claude requires the confirmed first-party claude.ai login')
-    plan = declaration.get('subscription_type')
-    if plan not in ('pro', 'max'):
-        raise PolicyError('Owner-confirmed personal subscription_type must be pro or max')
-    if status.get('subscriptionType') != plan:
-        raise PolicyError('Claude personal subscription does not match the owner-confirmed plan')
+    # Tariff is optional informational metadata, never an account/profile invariant.
+    # Native refresh may omit it and legitimate plan changes do not change identity.
     if status.get('configDirectory') != str(CONFIG):
         raise PolicyError('Claude auth status reports a different config directory')
     identity_matches(status, declaration)
