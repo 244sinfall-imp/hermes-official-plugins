@@ -10,9 +10,11 @@ from test_personal_isolation import offline, account, forbidden, MODEL
 
 @pytest.fixture
 def provider(monkeypatch):
-    # Core's lazy usage import probes its git version; suppress only that metadata probe.
+    # Match core's own test fixture: avoid both helper and direct Git probes
+    # when an isolated checkout has no installed build-metadata stamp.
     from hermes_cli import version_info
-    monkeypatch.setattr(version_info, '_run_git', lambda *a, **kw: None)
+    monkeypatch.setattr(version_info, '_cached_version_info', version_info.VersionInfo(
+        'unknown', 'git.0000000', None, '0' * 40, 'main', 'git'))
     # A lazy account_usage -> auth -> config import enumerates providers; keep that
     # unrelated metadata hook away from real config and installed plugin discovery.
     monkeypatch.setattr(providers, 'list_providers', lambda: [])
