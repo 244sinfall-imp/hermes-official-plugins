@@ -1,0 +1,17 @@
+name: claude-subscription-directsdk-experimental
+kind: model-provider
+version: 0.3.2
+manifest_version: 2
+description: Default-profile-only personal Claude Pro/Max adapter; private owner-confirmed activation required; no ambient or foreign credentials
+author: Nous Research
+license: MIT
+homepage: https://github.com/NousResearch/hermes-plugin-claude-subscription-directsdk
+tags: [model-provider, anthropic, claude, subscription, experimental]
+requires_hermes: ">=0.21.4"
+platforms: [linux]
+optional_env:
+  - CLAUDE_SUBSCRIPTION_DIRECTSDK_COMMAND
+  - CLAUDE_SUBSCRIPTION_DIRECTSDK_CONFIG_DIR
+  - CLAUDE_CONFIG_DIR
+external_dependencies: []  # Integrity verification is enforced by profile_policy.binary().
+config_schema: {}

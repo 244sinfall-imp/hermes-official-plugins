@@ -1,0 +1,199 @@
+{
+  "schema": 1,
+  "kind": "code-only-personal-deployment-baseline",
+  "upstream_repo": "git@github.com:NousResearch/hermes-official-plugins.git",
+  "upstream_main": "f98c0999c6dd4e59680addc8f3480208018ab5b0",
+  "catalog_pin": "6dacaaddbfd8e98dfc524096c44f712f743246b8",
+  "upstream_plugin_version": "0.3.3",
+  "actual_baseline": {
+    "source": "/home/hermes/.hermes/plugins/claude-subscription-directsdk-personal",
+    "git_repository": false,
+    "pyproject_version": "0.3.1",
+    "plugin_manifest_version": "0.3.2",
+    "note": "Actual installed allowlisted bytes, not upgraded from upstream; historical manifest and package versions differ."
+  },
+  "files": [
+    {
+      "path": "__init__.py",
+      "sha256": "0f1caad366a45927926e2da828cda11408fc1d490bd6f3843c588df5f5600c6b",
+      "bytes": 10830
+    },
+    {
+      "path": "admission.py",
+      "sha256": "89bbad4239619d8f877a734c86ec8b94efb19c3f601aed9c94a72ee28bfee868",
+      "bytes": 25979
+    },
+    {
+      "path": "directsdk.py",
+      "sha256": "99b395f49234fe7ef754a63386d7c938a99f5b2cb318a219b5619c7fe0978700",
+      "bytes": 44615
+    },
+    {
+      "path": "directsdk_setup.py",
+      "sha256": "dd6936a2abe74e7660cb552b6ec86c46571beee3a69894042e7acadfc63d8508",
+      "bytes": 11458
+    },
+    {
+      "path": "inert_mcp.py",
+      "sha256": "bf20a09b2358600981b115c32845ec24722cb66adfc18d247d1c35ed999a0e0a",
+      "bytes": 935
+    },
+    {
+      "path": "model_catalog.py",
+      "sha256": "36341d875d2e27beaf3e9bc902900280d34eb491374e88e7877cc33a1714178e",
+      "bytes": 3547
+    },
+    {
+      "path": "profile_policy.py",
+      "sha256": "43a9945d6ef7854adcf6ad6e812f6cd53d0c08e60ba1de34e9e6eec80104736c",
+      "bytes": 11474
+    },
+    {
+      "path": "plugin.yaml",
+      "sha256": "dc81622689b67cd7b71fcd211bdc3b9e60b6f8e3af7bdfc24a4bd12038e1d83a",
+      "bytes": 722
+    },
+    {
+      "path": "pyproject.toml",
+      "sha256": "825718d7e36fd60197b317271934b45c9c8d5795b738cc3460a694b2d8767f0d",
+      "bytes": 647
+    },
+    {
+      "path": "README.md",
+      "sha256": "2f3c7b2f6fc66e6366dc9077874b3edbabb71b24e5465293b5d15b7ab5617e83",
+      "bytes": 6178
+    },
+    {
+      "path": "UPSTREAM_README.md",
+      "sha256": "3c4c7084b7f226c4ada2230e9da65d6a79ea256c02127a64cd965dd0691d4cda",
+      "bytes": 30800
+    },
+    {
+      "path": "AGENTS.md",
+      "sha256": "74c8d38f991a56bf49af374a6c4db7ffed2cbc80513a252a2a884385e6e1a40b",
+      "bytes": 5544
+    },
+    {
+      "path": "LICENSE",
+      "sha256": "f26e906c042707a257816cf8a0396556b596be540b8add290132b8d72c080d60",
+      "bytes": 1087
+    },
+    {
+      "path": "conftest.py",
+      "sha256": "e2d15b4ee035f536e2605f40f0c06f8ae9ae19a4186b221a143c09427c9d973f",
+      "bytes": 2124
+    },
+    {
+      "path": "tests/test_admission_breakpoint.py",
+      "sha256": "ccd64b494414879b712acd8ef350e3a4111102b59fa43da4ea8f49982d87fe6e",
+      "bytes": 10051
+    },
+    {
+      "path": "tests/test_admission_first_turn.py",
+      "sha256": "361048a38087dda15c5dc388ce5bc34298ae3f798641e5b54ce59dae430c87de",
+      "bytes": 5758
+    },
+    {
+      "path": "tests/test_admission_proxy.py",
+      "sha256": "426917a7c7ac3230a72aef2967acc581f906d82f4878a2d7560bda99752a2150",
+      "bytes": 5311
+    },
+    {
+      "path": "tests/test_admission_restoration.py",
+      "sha256": "17a6d534facad71249f047211af71fe851b83d288ac4d910727a192d4aedd9bc",
+      "bytes": 19983
+    },
+    {
+      "path": "tests/test_admission_two_marks.py",
+      "sha256": "b0d8d0f595df822614093d43db2a6ed8362e4675cde2c80bda56ee08ecc75e43",
+      "bytes": 7448
+    },
+    {
+      "path": "tests/test_directsdk.py",
+      "sha256": "35473611641919ad87f43c234d9071d6e54511dace3b98ab3806a2f783a0cbcd",
+      "bytes": 22606
+    },
+    {
+      "path": "tests/test_directsdk_account_usage.py",
+      "sha256": "5b5bb0cc2a1132e5c773dfde5eb2d9387556e2ef23a496af34614ef13203c7d3",
+      "bytes": 5567
+    },
+    {
+      "path": "tests/test_directsdk_admission.py",
+      "sha256": "030872bcb173dd3a176d3a55b028f7b60e2bf67d7bb7894371c4a8b060ee4552",
+      "bytes": 30972
+    },
+    {
+      "path": "tests/test_directsdk_discovery.py",
+      "sha256": "633e19c1d3cb6afec6a9ea857e12b449b5a2315c996e97ed223d7d24abba7b39",
+      "bytes": 5454
+    },
+    {
+      "path": "tests/test_directsdk_errors.py",
+      "sha256": "00867d3a9c964a4e59ceaadf01e3c03e03a796bdb4749f99a4686874c7f4ef33",
+      "bytes": 3489
+    },
+    {
+      "path": "tests/test_directsdk_headers.py",
+      "sha256": "3728e68e299a0089da965b3970466d7bd7623799a96157e18566620273f3137f",
+      "bytes": 2993
+    },
+    {
+      "path": "tests/test_directsdk_models.py",
+      "sha256": "504a3a759c715454aa7062184114d3310aa91ac556bb38e1ef07fceea98685b6",
+      "bytes": 3444
+    },
+    {
+      "path": "tests/test_directsdk_replay.py",
+      "sha256": "02a6b4277e1942dbe004a3bf17d44363f5ae1afea3f3c0bed4544250658abda5",
+      "bytes": 5474
+    },
+    {
+      "path": "tests/test_directsdk_setup.py",
+      "sha256": "fa5b17f1178aab5f56c33ae329363231c3097d310f3b67163ea560a2df431e74",
+      "bytes": 14270
+    },
+    {
+      "path": "tests/test_directsdk_telemetry.py",
+      "sha256": "9e0e6c471dffd5e83c41dc2a1db93793eedec5ac2ec954456adea397ef827c39",
+      "bytes": 5892
+    },
+    {
+      "path": "tests/test_directsdk_vision.py",
+      "sha256": "52a5892dd466df6254a519ea61e44602830aeb66d4bd7601f3559bf7a112a791",
+      "bytes": 3641
+    },
+    {
+      "path": "tests/test_directsdk_workspace.py",
+      "sha256": "b40198a62aef739f99d774a2de51714a77e3c9dcf7218db87cbdd9ae52b69cfd",
+      "bytes": 8272
+    },
+    {
+      "path": "tests/test_personal_isolation.py",
+      "sha256": "bdf751e92ef786c938b848c48342eaefafa4e5bcfcd6c03ccdaef23030af5fec",
+      "bytes": 11192
+    },
+    {
+      "path": "tests/test_personal_provider.py",
+      "sha256": "828998f84bb79a1307e8db30f001f936c497dfd81a2f1c0f0f73662cf5a5aef3",
+      "bytes": 1806
+    },
+    {
+      "path": "tests/test_provider_publication.py",
+      "sha256": "b3c66abc5702437a81741d20a317fd3fb3cd795418e709a5c00ecb0d2916123f",
+      "bytes": 1936
+    }
+  ],
+  "exclusions": [
+    "credentials",
+    "policy JSON",
+    "identity pins",
+    "config",
+    "runtime",
+    "logs",
+    "caches",
+    "binaries",
+    "assets",
+    "evals"
+  ]
+}
