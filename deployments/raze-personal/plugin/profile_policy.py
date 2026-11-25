@@ -11,7 +11,7 @@ from pathlib import Path
 import stat
 import subprocess
 
-HOME = Path('/home/hermes/.hermes')
+HOME = Path('/home/raze/.hermes')
 CONFIG = HOME / 'claude-config'
 CLI_HOME = HOME / 'claude-home'
 RUNTIME = HOME / 'claude-runtime'

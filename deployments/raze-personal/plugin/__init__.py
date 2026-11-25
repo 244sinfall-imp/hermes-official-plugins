@@ -16,14 +16,14 @@ except ImportError:
     from model_catalog import ALIASES, MODEL_METADATA, MODEL_CAPABILITIES, native_model
     from directsdk_setup import INSTALL_HINT, _resolve
 
-MODEL_METADATA = {key: value for key, value in MODEL_METADATA.items() if key in ('claude-opus-5-5[1m]', 'claude-sonnet-5-5[1m]')}
-MODEL_CAPABILITIES = {key: value for key, value in MODEL_CAPABILITIES.items() if key.removesuffix('[1m]') in ('claude-opus-5-5', 'claude-sonnet-5-5', 'opus', 'sonnet')}
+MODEL_METADATA = {key: value for key, value in MODEL_METADATA.items() if key in ('claude-opus-5-5[1m]', 'claude-sonnet-5-5[1m]', 'claude-opus-4-8[1m]')}
+MODEL_CAPABILITIES = {key: value for key, value in MODEL_CAPABILITIES.items() if key.removesuffix('[1m]') in ('claude-opus-5-5', 'claude-sonnet-5-5', 'claude-opus-4-8', 'opus', 'sonnet')}
 ALIASES = {'opus': 'claude-opus-5-5', 'sonnet': 'claude-sonnet-5-5'}
 logger = logging.getLogger(__name__)
 
 # Core checks `process_command` with a PATH-only `shutil.which` before this plugin is asked, so a CLI found only in
 # an install prefix is handed over as its absolute path; a PATH hit keeps the bare name and follows PATH.
-_process_command = '/home/hermes/.hermes/claude-home/.local/share/claude/versions/2.1.292'
+_process_command = '/home/raze/.hermes/claude-home/.local/share/claude/versions/2.1.292'
 _found = [_process_command]
 
 
